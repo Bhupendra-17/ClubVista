@@ -1,0 +1,6 @@
+/* Add this CSS to your global styles or a custom stylesheet */
+.fc-day:hover {
+    background-color: rgba(48, 179, 196); /* Light Indigo color on hover */
+    cursor: pointer;
+  }
+  
