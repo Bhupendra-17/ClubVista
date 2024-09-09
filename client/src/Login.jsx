@@ -29,6 +29,7 @@ const Login = () => {
       toast.error(`Invalid credentials`, {
         position: 'top-center',
       });
+      console.log(error);
     }
   };
 
