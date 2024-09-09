@@ -1,8 +1,8 @@
 // Import necessary functions
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import CalendarPage from './CalendarPage'; 
+import CalendarPage from './CalendarPage';
 import { db, auth, storage } from './firebase'; // Added auth import for user authentication
-import { addDoc, collection, getDocs, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore'; 
+import { addDoc, collection, getDocs, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth'; // Auth state listener
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import './CalendarPage.css';
@@ -18,8 +18,8 @@ const Home = () => {
     details: '',
   });
   const [currentUser, setCurrentUser] = useState(null); // Store the currently logged-in user
-  const [editEventId, setEditEventId] = useState(null); 
-  const [selectedEvent, setSelectedEvent] = useState(null); 
+  const [editEventId, setEditEventId] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
@@ -59,8 +59,8 @@ const Home = () => {
 
   const handleDateClick = useCallback((info) => {
     setNewEvent({ ...newEvent, date: info.dateStr });
-    setEditEventId(null); 
-    setIsModalOpen(true); 
+    setEditEventId(null);
+    setIsModalOpen(true);
   }, [newEvent]);
 
   const handleFileChange = (e) => {
@@ -73,7 +73,7 @@ const Home = () => {
     const files = fileSnapshot.docs.map(doc => doc.data());
 
     if (files.length > 0) {
-      return files[0].url; 
+      return files[0].url;
     } else {
       return null;
     }
@@ -102,8 +102,8 @@ const Home = () => {
       await addDoc(collection(db, 'files'), { eventId: selectedEvent.id, url: fileURL, name: file.name });
 
       alert('File uploaded successfully!');
-      setFile(null); 
-      setSelectedEvent(null); 
+      setFile(null);
+      setSelectedEvent(null);
     } catch (error) {
       console.error('Error uploading file: ', error);
     } finally {
@@ -112,86 +112,103 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-sky-700 to-stone-700 p-6 pb-12">
-      <h1 className="text-3xl font-bold mb-9 text-white hover:text-rose-300">Welcome to Club Manager</h1>
+    <>
+      {/* Sticky Navbar */}
+      <header className="sticky top-0 z-50 bg-stone-200  shadow-lg">
+          <nav className="container mx-auto p-4 flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-gray-800 ">ClubVista</h1>
+          </nav>
+        </header>
+      <div className="min-h-screen bg-gradient-to-r from-sky-700 to-stone-700 p-6 pb-12">
+        
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="lg:w-3/5 border border-gray-300 shadow-md p-4  bg-gradient-to-r from-rose-300 to-orange-300 rounded-lg ">
-          <CalendarPage events={events} onDateClick={handleDateClick} />
-        </div>
+        <h1 className="text-3xl font-bold mb-9 text-white">Manage your events here...</h1>
 
-        <div className="lg:w-2/5 border border-gray-300 shadow-md p-4 bg-gradient-to-r from-rose-300 to-orange-300 rounded-lg h-fit">
-          <h2 className="text-xl font-bold mb-4">Event List</h2>
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="lg:w-3/5 border border-gray-300 shadow-md p-4  bg-gradient-to-r from-rose-300 to-orange-300 rounded-lg ">
+            <CalendarPage events={events} onDateClick={handleDateClick} />
+          </div>
 
-          {filteredEvents.length === 0 ? (
-            <p>No events available for this month</p>
-          ) : (
-            <ul className=" flex flex-col gap-2">
-              {filteredEvents.map(event => (
-                <li key={event.id} className=" bg-white px-5 py-1 rounded-lg">
-                  <div>
-                    <strong>{event.title}</strong> on <strong>{event.date}</strong>
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Organized For: {event.organizedFor} | In-Charge: {event.inCharge}
-                  </div>
-                  <div className="flex gap-2 mt-2 text-md">
-                    <button
-                      className="border border-gray-500 py-1 hover:bg-black hover:text-white rounded-full px-3 font-semibold "
-                      onClick={async () => {
-                        const fileUrl = await fetchFileForEvent(event.id);
-                        if (fileUrl) {
-                          window.open(fileUrl, '_blank');
-                        } else {
-                          alert('No report available for this event.');
-                        }
-                      }}>
-                      View File
-                    </button>
-                    <button
-                      className="border border-gray-500 rounded-full px-3 font-semibold  hover:bg-black hover:text-white"
-                      onClick={() => setSelectedEvent(event)}
-                    >
-                      Upload Report
-                    </button>
-                    <button
-                      className="text-red-600 border border-gray-500 rounded-full px-3 font-semibold  hover:bg-red-600 hover:text-white"
-                      onClick={() => handleDeleteEvent(event.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+          <div className="lg:w-2/5 border border-gray-300 shadow-md p-4 bg-gradient-to-r from-rose-300 to-orange-300 rounded-lg h-fit">
+            <h2 className="text-xl font-bold mb-4">Event List</h2>
+
+            {filteredEvents.length === 0 ? (
+              <p>No events available for this month</p>
+            ) : (
+              <ul className=" flex flex-col gap-2">
+                {filteredEvents.map(event => (
+                  <li key={event.id} className=" bg-white px-5 py-1 rounded-lg">
+                    <div>
+                      <strong>{event.title}</strong> on <strong>{event.date}</strong>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Organized For: {event.organizedFor} | In-Charge: {event.inCharge}
+                    </div>
+                    <div className="flex gap-2 mt-2 text-md">
+                      <button
+                        className="border border-gray-500 py-1 hover:bg-black hover:text-white rounded-full px-3 font-semibold "
+                        onClick={async () => {
+                          const fileUrl = await fetchFileForEvent(event.id);
+                          if (fileUrl) {
+                            window.open(fileUrl, '_blank');
+                          } else {
+                            alert('No report available for this event.');
+                          }
+                        }}>
+                        View File
+                      </button>
+                      <button
+                        className="border border-gray-500 rounded-full px-3 font-semibold  hover:bg-black hover:text-white"
+                        onClick={() => setSelectedEvent(event)}
+                      >
+                        Upload Report
+                      </button>
+                      <button
+                        className="text-red-600 border border-gray-500 rounded-full px-3 font-semibold  hover:bg-red-600 hover:text-white"
+                        onClick={() => handleDeleteEvent(event.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {selectedEvent && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div className="bg-white p-8 rounded-lg shadow-md w-11/12 md:w-3/4 lg:w-3/4">
+                <h3 className="text-xl font-bold mb-4">Upload Report for {selectedEvent.title}</h3>
+                <input type="file" onChange={handleFileChange} />
+                <div className="flex justify-start gap-4 mt-4">
+                  <button
+                    className="bg-gray-500 text-white px-4 py-2 rounded"
+                    onClick={() => setSelectedEvent(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    onClick={handleUploadReport}
+                    disabled={uploading}
+                  >
+                    {uploading ? 'Uploading...' : 'Upload'}
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
 
-        {selectedEvent && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-8 rounded-lg shadow-md w-11/12 md:w-3/4 lg:w-3/4">
-              <h3 className="text-xl font-bold mb-4">Upload Report for {selectedEvent.title}</h3>
-              <input type="file" onChange={handleFileChange} />
-              <div className="flex justify-start gap-4 mt-4">
-                <button
-                  className="bg-gray-500 text-white px-4 py-2 rounded"
-                  onClick={() => setSelectedEvent(null)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  onClick={handleUploadReport}
-                  disabled={uploading}
-                >
-                  {uploading ? 'Uploading...' : 'Upload'}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
-    </div>
+      {/* Footer */}
+      <footer className="bg-gray-800 text-white py-4">
+        <div className="container mx-auto text-center">
+          <p>&copy; {new Date().getFullYear()} ClubVista. All rights reserved.</p>
+        </div>
+      </footer>
+    </>
   );
 };
 
