@@ -24,6 +24,7 @@ const Landing = () => {
         </header>
 
         {/* Main Content */}
+        {/* Dark text is changed to white */}
         <main className="flex-1 flex flex-col items-center justify-center">
           <div className="container mx-auto px-4 py-12">
             <h2 className="text-4xl font-bold text-white text-center mb-6 animate-bounce">
